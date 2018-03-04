@@ -1,0 +1,27 @@
+{
+  "manifest_version": 2,
+
+  "name": "Nextech Jira Enhancements 2.0",
+  "description": "This extension adds some helpful UI elements to Jira.",
+  "version": "2.0",
+  
+  "content_scripts": [
+    {
+      "matches": ["https://nextech.atlassian.net/*"],
+      "run_at": "document_start",
+      "js": ["jiraInject.js"]
+    }
+  ],
+
+  "icons": {
+    "48": "Nextech.png"
+  },
+  "browser_action": {
+    "default_icon": "Nextech.png"
+  },
+  "permissions": [
+    "activeTab",
+    "tabs",
+    "https://nextech.atlassian.net/*"
+  ]
+}
