@@ -2,8 +2,17 @@
 
 var observeDom = (function () {
     return function(obj, callback) {
+        if (!obj) {
+            return;
+        }
+
         // define a new observer
         var obs = new MutationObserver(function(mutations, observer) {
+            for (let mut of mutations) {
+                for (let node of mut.addedNodes) {
+                    console.log(node);
+                }
+            }
             callback();
         });
         // have the observer observe foo for changes in children
@@ -12,28 +21,49 @@ var observeDom = (function () {
 })();
 
 document.addEventListener('DOMContentLoaded', function() {
-    observeDom(document.getElementById('stalker'), function () { 
-        addCopyControls();
+    addCopyControlsToIssuePage();
+    
+    // Certain actions on the issue page can cause the buttons to go away.
+    // So add an observer to the parent control to ensure it's added.
+    observeDom(document.getElementById('content'), function () { 
+        addCopyControlsToIssuePage();
     });
 });
 
-function addCopyControls() {
-    var copyKeyElementId = 'nx-copy-key';
+window.addEventListener('load', function () {
+    addCopyControlsToBoardPage();
+
+    observeDom(document.getElementById('jira'), function () { 
+        addCopyControlsToBoardPage();
+    });
+});
+
+const copyKeyElementId = 'nx-copy-key';
+const copyKeyAndSummaryElementId = 'nx-copy-key-and-summary';
+
+function addCopyControlsToIssuePage() {
     if (document.getElementById(copyKeyElementId)) {
         // Already added
         return;
     }
 
-    var siblingElement = document.getElementById('opsbar-operations_more');
+    //var siblingElement = document.getElementById('opsbar-operations_more');
+    var siblingElement = document.getElementById('jira-share-trigger');
     if (siblingElement) {
-        addScriptToHeader();
+        addScriptToHeader('document.getElementById("key-val").innerText',
+            'document.getElementById("summary-val").innerText');
 
         siblingElement = siblingElement.parentElement.parentElement;
-        siblingElement.insertAdjacentHTML('afterend',
-            getCopyElement('Copy Key', 'getKey()', copyKeyElementId) + 
-            getCopyElement('Copy Key + Summary', 'getKeyAndSummary()', 'nx-copy-key-and-summary')
+        siblingElement.insertAdjacentHTML('beforebegin',
+            getCopyListElement('Copy Key', 'getKey()', copyKeyElementId) + 
+            getCopyListElement('Copy Key + Summary', 'getKeyAndSummary()', copyKeyAndSummaryElementId)
         );
+    }
+};
 
+function addCopyControlsToBoardPage() {
+    if (document.getElementById(copyKeyElementId)) {
+        // Already added
         return;
     }
 
@@ -41,17 +71,28 @@ function addCopyControls() {
     var params = new URLSearchParams(url);
     var selectedKey = params.get('selectedIssue');
     if (selectedKey) {
+        var buttons = document.getElementsByClassName('jurdfZ');
+        if (buttons.length > 0) {
+            addScriptToHeader(`'${selectedKey}'`,
+                "document.getElementsByClassName('ghx-summary')[0].innerText");
+
+            var buttonDiv = buttons[buttons.length - 1].parentElement.parentElement;
+            buttonDiv.insertAdjacentHTML('afterend', 
+                getCopyElementForModal('Copy Key', `'${selectedKey}'`, copyKeyElementId) +
+                getCopyElementForModal('Copy Key + Summary', 'getKeyAndSummary()', copyKeyAndSummaryElementId)
+            );
+        }
     }
 };
 
-function addScriptToHeader() {
+function addScriptToHeader(keyText, summaryText) {
     var script = `
         function getKey() {
-            return document.getElementById('key-val').innerText;
+            return ${keyText};
         }
         
         function getSummary() {
-            return document.getElementById('summary-val').innerText;
+            return ${summaryText};
         }
         
         function getKeyAndSummary() {
@@ -74,14 +115,27 @@ function addScriptToHeader() {
     var headElement = document.head.appendChild(scriptElement);
 }
 
-function getCopyElement(text, textToCopy, elementId) {
+function getCopyListElement(text, textToCopy, elementId) {
     return `
-        <ul class="toolbar-group pluggable-ops" id="${elementId}">
+        <ul class="toolbar-group pluggable-ops">
             <li class="toolbar-item toolbar-analytics">
-                <a onclick="copyToClipboard(${textToCopy});" class="toolbar-trigger">
+                <a onclick="copyToClipboard(${textToCopy});" id="${elementId}" class="toolbar-trigger">
                     ${text}
                 </a>
             </li>
         </ul>
         `;
+}
+
+function getCopyElementForModal(text, textToCopy, elementId) {
+    return `
+        <div>
+            <span class="igMaON">
+            <button onclick="copyToClipboard(${textToCopy});" id="${elementId}" class="jurdfZ" spacing="none" type="button">
+                <div style="display: inline-flex; align-items: center; height: 32px; margin-left: 8px; margin-right: 8px">
+                    ${text}
+                </div>
+            </button>
+            </span>
+        </div>`;
 }
