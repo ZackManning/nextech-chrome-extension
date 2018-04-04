@@ -36,7 +36,7 @@ function reverseString(str) {
 }
 
 function isJiraKey(text) {
-    let match = /[A-Z]+\-[0-9]+/i.exec(text);
+    let match = /[A-Z]+[\- ][0-9]+/i.exec(text);
     return match ? true : false;
 }
 
