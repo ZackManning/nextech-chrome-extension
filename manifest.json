@@ -2,7 +2,7 @@
     "manifest_version": 2,
     "name": "Nextech Agile Enhancements",
     "description": "This extension adds some helpful UI elements to Jira and Github.",
-    "version": "2.0",
+    "version": "1.0",
     "content_scripts": [
         {
             "matches": [
@@ -16,7 +16,8 @@
         {
             "matches": [
                 "https://nextech.atlassian.net/*",
-                "https://github.com/*"
+                "https://github.com/*",
+                "https://*.visualstudio.com/*"
             ],
             "run_at": "document_start",
             "js": [
@@ -32,7 +33,8 @@
     },
     "icons": {
         "16": "JiraIssue.png",
-        "48": "Nextech.png"
+        "48": "Nextech.png",
+        "128": "Nextech.png"
     },
     "browser_action": {
         "default_icon": "Nextech.png"
