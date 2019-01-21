@@ -10,7 +10,7 @@ var observeDom = (function () {
         var obs = new MutationObserver(function(mutations, observer) {
             for (let mut of mutations) {
                 for (let node of mut.addedNodes) {
-                    console.log(node);
+                    //console.log(node);
                 }
             }
             callback();
@@ -58,6 +58,8 @@ function addCopyControlsToIssuePage() {
             getCopyListElement('Copy Key', 'getKey()', copyKeyElementId) + 
             getCopyListElement('Copy Key + Summary', 'getKeyAndSummary()', copyKeyAndSummaryElementId)
         );
+
+        addCopyEventListeners();
     }
 };
 
@@ -81,8 +83,22 @@ function addCopyControlsToBoardPage() {
                 getCopyElementForModal('Copy Key', `'${selectedKey}'`, copyKeyElementId) +
                 getCopyElementForModal('Copy Key + Summary', 'getKeyAndSummary()', copyKeyAndSummaryElementId)
             );
+
+            addCopyEventListeners();
         }
     }
+};
+
+function addCopyEventListeners() {
+    var actualCode = '(' + function() {
+            document.getElementById('nx-copy-key').addEventListener('click', () => { copyToClipboard(getKey()) });
+            document.getElementById('nx-copy-key-and-summary').addEventListener('click', () => { copyToClipboard(getKeyAndSummary()); });
+        } + ')();';
+
+        var script = document.createElement('script');
+        script.textContent = actualCode;
+        (document.head || document.documentElement).appendChild(script);
+        script.remove();
 };
 
 function addScriptToHeader(keyText, summaryText) {
@@ -119,7 +135,7 @@ function getCopyListElement(text, textToCopy, elementId) {
     return `
         <ul class="toolbar-group pluggable-ops">
             <li class="toolbar-item toolbar-analytics">
-                <a onclick="copyToClipboard(${textToCopy});" id="${elementId}" class="toolbar-trigger">
+                <a id="${elementId}" class="toolbar-trigger">
                     ${text}
                 </a>
             </li>
@@ -131,7 +147,7 @@ function getCopyElementForModal(text, textToCopy, elementId) {
     return `
         <div>
             <span class="igMaON">
-            <button onclick="copyToClipboard(${textToCopy});" id="${elementId}" class="jurdfZ" spacing="none" type="button">
+            <button id="${elementId}" class="jurdfZ" spacing="none" type="button">
                 <div style="display: inline-flex; align-items: center; height: 32px; margin-left: 8px; margin-right: 8px">
                     ${text}
                 </div>
