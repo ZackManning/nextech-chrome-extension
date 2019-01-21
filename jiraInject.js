@@ -55,8 +55,8 @@ function addCopyControlsToIssuePage() {
 
         siblingElement = siblingElement.parentElement.parentElement;
         siblingElement.insertAdjacentHTML('beforebegin',
-            getCopyListElement('Copy Key', 'getKey()', copyKeyElementId) + 
-            getCopyListElement('Copy Key + Summary', 'getKeyAndSummary()', copyKeyAndSummaryElementId)
+            getCopyListElement('Copy Key', copyKeyElementId) + 
+            getCopyListElement('Copy Key + Summary', copyKeyAndSummaryElementId)
         );
 
         addCopyEventListeners();
@@ -80,8 +80,8 @@ function addCopyControlsToBoardPage() {
 
             var buttonDiv = buttons[buttons.length - 1].parentElement.parentElement;
             buttonDiv.insertAdjacentHTML('afterend', 
-                getCopyElementForModal('Copy Key', `'${selectedKey}'`, copyKeyElementId) +
-                getCopyElementForModal('Copy Key + Summary', 'getKeyAndSummary()', copyKeyAndSummaryElementId)
+                getCopyElementForModal('Copy Key', copyKeyElementId) +
+                getCopyElementForModal('Copy Key + Summary', copyKeyAndSummaryElementId)
             );
 
             addCopyEventListeners();
@@ -131,7 +131,7 @@ function addScriptToHeader(keyText, summaryText) {
     var headElement = document.head.appendChild(scriptElement);
 }
 
-function getCopyListElement(text, textToCopy, elementId) {
+function getCopyListElement(text, elementId) {
     return `
         <ul class="toolbar-group pluggable-ops">
             <li class="toolbar-item toolbar-analytics">
@@ -143,7 +143,7 @@ function getCopyListElement(text, textToCopy, elementId) {
         `;
 }
 
-function getCopyElementForModal(text, textToCopy, elementId) {
+function getCopyElementForModal(text, elementId) {
     return `
         <div>
             <span class="igMaON">
