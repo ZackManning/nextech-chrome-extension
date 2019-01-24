@@ -1,18 +1,23 @@
-// Copyright (c) 2012 The Chromium Authors. All rights reserved.
-// Use of this source code is governed by a BSD-style license that can be
-// found in the LICENSE file.
 
-// The onClicked callback function.
 function onClickHandler(info, tab) {
+    console.warn(info);
     let jiraKey = getJiraKeyFromText(info.selectionText);
     if (jiraKey) {
-        let url = 'https://nextech.atlassian.net/browse/' + jiraKey;
+        let url;
+        if (info.menuItemId === 'goToJiraIssueOnBoard') {
+            url = 'https://nextech.atlassian.net/secure/RapidBoard.jspa?selectedIssue=' + jiraKey;
+        }
+        else {
+            url = 'https://nextech.atlassian.net/browse/' + jiraKey;
+        }
         chrome.tabs.create({
             url: url,
             index: tab.index + 1
         });
     }
 };
+
+chrome.contextMenus.onClicked.addListener(onClickHandler);
 
 function getJiraKeyFromText(text) {
     let projectMatch = /[^A-Z]/i.exec(text);
@@ -40,29 +45,40 @@ function isJiraKey(text) {
     return match ? true : false;
 }
 
-chrome.contextMenus.onClicked.addListener(onClickHandler);
+var menuItems = [
+    {
+        id: null,
+        options: {
+            "title": "Go to Jira issue %s",
+            "contexts": ["selection"],
+            "id": "goToJiraIssue"
+        }
+    },
+    {
+        id: null,
+        options: {
+            "title": "Go to sprint board for issue %s",
+            "contexts": ["selection"],
+            "id": "goToJiraIssueOnBoard"
+        }
+    }
+];
 
-var jiraMenuId = null;
 chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
     if (msg.request === 'updateContextMenu') {
-        if (isJiraKey(msg.selection)) {
-            let options = {
-                "title": "Go to Jira issue %s",
-                "contexts": ["selection"],
-                "id": "goToJiraIssue"
-            };
-            if (jiraMenuId != null) {
-                chrome.contextMenus.update(jiraMenuId, options);
+        menuItems.forEach((item) => {
+            if (isJiraKey(msg.selection)) {
+                if (item.id) {
+                    chrome.contextMenus.update(item.id, item.options);
+                }
+                else {
+                    item.id = chrome.contextMenus.create(item.options);
+                }
             }
             else {
-                jiraMenuId = chrome.contextMenus.create(options);
+                chrome.contextMenus.remove(item.options);
+                item.id = null;
             }
-        }
-        else {
-            if (jiraMenuId != null) {
-                chrome.contextMenus.remove(jiraMenuId);
-                jiraMenuId = null;
-            }
-        }
+        });
     }
 });
