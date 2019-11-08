@@ -53,7 +53,7 @@ var menuItems = [
             "contexts": ["selection"],
             "id": "goToJiraIssue"
         }
-    },
+    }/*,
     {
         id: null,
         options: {
@@ -61,7 +61,7 @@ var menuItems = [
             "contexts": ["selection"],
             "id": "goToJiraIssueOnBoard"
         }
-    }
+    }*/
 ];
 
 chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
