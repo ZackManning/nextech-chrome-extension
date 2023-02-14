@@ -5,10 +5,10 @@ function onClickHandler(info, tab) {
     if (jiraKey) {
         let url;
         if (info.menuItemId === 'goToJiraIssueOnBoard') {
-            url = 'https://nextech.atlassian.net/secure/RapidBoard.jspa?selectedIssue=' + jiraKey;
+            url = 'https://finthrive.atlassian.net/secure/RapidBoard.jspa?selectedIssue=' + jiraKey;
         }
         else {
-            url = 'https://nextech.atlassian.net/browse/' + jiraKey;
+            url = 'https://finthrive.atlassian.net/browse/' + jiraKey;
         }
         chrome.tabs.create({
             url: url,
